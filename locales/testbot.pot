@@ -1,0 +1,77 @@
+# Translations template for PROJECT.
+# Copyright (C) 2023 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2023-04-23 15:43-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: routes.py:51 routes.py:312 routes.py:320 routes.py:328 routes.py:380
+#: routes.py:582 routes.py:593 routes.py:608 routes.py:619 routes.py:672
+#: routes.py:696 routes.py:720
+msgid "Mening murojaatlarim"
+msgstr ""
+
+#: routes.py:52 routes.py:313 routes.py:321 routes.py:329 routes.py:381
+#: routes.py:583 routes.py:594 routes.py:609 routes.py:620 routes.py:673
+#: routes.py:697 routes.py:721
+msgid "Murojaatingizni qoldiring"
+msgstr ""
+
+#: routes.py:53 routes.py:314 routes.py:322 routes.py:330 routes.py:382
+#: routes.py:584 routes.py:595 routes.py:610 routes.py:621 routes.py:674
+#: routes.py:698 routes.py:722
+msgid "Tilni o'zgartirish"
+msgstr ""
+
+#: routes.py:54 routes.py:315 routes.py:323 routes.py:331 routes.py:383
+#: routes.py:535 routes.py:585 routes.py:596 routes.py:611 routes.py:622
+#: routes.py:675 routes.py:699 routes.py:723
+msgid "Sozlamalar"
+msgstr ""
+
+#: routes.py:142 routes.py:269 routes.py:378 routes.py:562 routes.py:564
+#: routes.py:580 routes.py:581 routes.py:606 routes.py:607 routes.py:635
+#: routes.py:669 routes.py:670 routes.py:694 routes.py:695
+msgid "Bekor qilish"
+msgstr ""
+
+#: routes.py:533
+msgid "Ma'lumotlarni ko'rish"
+msgstr ""
+
+#: routes.py:548
+msgid "Ism sharifini o`zgartirish"
+msgstr ""
+
+#: routes.py:550
+msgid "Telefonni o`zgartirish"
+msgstr ""
+
+#: routes.py:567 routes.py:569
+msgid "Kontaktni yuboring"
+msgstr ""
+
+#: routes.py:634
+msgid "Ism sharifini o'zgartirish"
+msgstr ""
+
+#: routes.py:634
+msgid "Telefonni o'zgartirish"
+msgstr ""
+
+#: routes.py:634
+msgid "Hududi o'zgartirish"
+msgstr ""
+
