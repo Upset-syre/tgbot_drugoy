@@ -754,7 +754,9 @@ async def change_tuman(message: types.Message, state: FSMContext):
         return
 
     else:
-       
+        async with state.proxy() as data:
+            object = tuple(data.values())
+
         if user.lang == 'uz':
             cat = await db.session.execute(select(db.Viloyat).filter_by(name_uz=object[0]))
         if user.lang == 'ru':
