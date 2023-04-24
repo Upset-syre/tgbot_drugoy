@@ -251,7 +251,7 @@ async def load_phone(message: types.Message, state: FSMContext, editMessageReply
         await bot.send_message(message.from_user.id, text, reply_markup=kb)
 
 
-async def get_viloyats(lang: str) -> db.Viloyat:
+async def get_viloyats(lang: str) -> ReplyKeyboardMarkup:
     viloyats = await db.session.execute(select(db.Viloyat))
 
     viloyats = viloyats.scalars()
@@ -677,7 +677,7 @@ async def sendMyName(message: types.Message):
 
     sets_change = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(
         KeyboardButton(_("Ism sharifini o'zgartirish"))).add(KeyboardButton(_("Telefonni o'zgartirish"))).add(
-        _("Hududi o'zgartirish")).add(
+        _("Hududni o'zgartirish")).add(
         _('Bekor qilish'))
 
     if user.lang == 'uz':
@@ -694,15 +694,15 @@ async def sendMyName(message: types.Message):
                                reply_markup=sets_change)
 
 
-@dp.message_handler(Text(equals="Hududi o'zgartirish"))
-@dp.message_handler(Text(equals="Худуди ўзгартириш"))
+@dp.message_handler(Text(equals="Hududni o'zgartirish"))
+@dp.message_handler(Text(equals="Худудни ўзгартириш"))
 @dp.message_handler(Text(equals="Поменять область"))
 async def change_viloyat_button(message: types.Message):
     user = await db.session.execute(select(db.User).filter_by(tg_user_id=message.from_user.id))
     user = user.scalar()
     kb = await get_viloyats(user.lang)
     await Regist.change_viloyat.set()
-    await bot.send_message(message.from_user.id, "Tugmasini bosing", reply_markup=kb)
+    await bot.send_message(message.from_user.id, "Tugmasini bosing", reply_markup=kb.add( _('Bekor qilish')))
 
 
 async def handlers_uz():
@@ -720,6 +720,7 @@ async def change_viloyat(message: types.Message, state: FSMContext):
     user = user.scalar()
 
     if new_name == _('Bekor qilish'):
+        await state.finish()
         await bot.send_message(user_id, _('Bekor qilish'),
                                reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(
                                    KeyboardButton(_('Mening murojaatlarim'))

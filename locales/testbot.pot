@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-04-23 15:43-0700\n"
+"POT-Creation-Date: 2023-04-23 18:27-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,61 +17,62 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: routes.py:51 routes.py:312 routes.py:320 routes.py:328 routes.py:380
-#: routes.py:582 routes.py:593 routes.py:608 routes.py:619 routes.py:672
-#: routes.py:696 routes.py:720
+#: routes.py:51 routes.py:369 routes.py:377 routes.py:385 routes.py:438
+#: routes.py:626 routes.py:637 routes.py:652 routes.py:663 routes.py:726
+#: routes.py:751 routes.py:774
 msgid "Mening murojaatlarim"
 msgstr ""
 
-#: routes.py:52 routes.py:313 routes.py:321 routes.py:329 routes.py:381
-#: routes.py:583 routes.py:594 routes.py:609 routes.py:620 routes.py:673
-#: routes.py:697 routes.py:721
+#: routes.py:52 routes.py:370 routes.py:378 routes.py:386 routes.py:439
+#: routes.py:627 routes.py:638 routes.py:653 routes.py:664 routes.py:727
+#: routes.py:752 routes.py:775
 msgid "Murojaatingizni qoldiring"
 msgstr ""
 
-#: routes.py:53 routes.py:314 routes.py:322 routes.py:330 routes.py:382
-#: routes.py:584 routes.py:595 routes.py:610 routes.py:621 routes.py:674
-#: routes.py:698 routes.py:722
+#: routes.py:53 routes.py:371 routes.py:379 routes.py:387 routes.py:440
+#: routes.py:628 routes.py:639 routes.py:654 routes.py:665 routes.py:728
+#: routes.py:753 routes.py:776
 msgid "Tilni o'zgartirish"
 msgstr ""
 
-#: routes.py:54 routes.py:315 routes.py:323 routes.py:331 routes.py:383
-#: routes.py:535 routes.py:585 routes.py:596 routes.py:611 routes.py:622
-#: routes.py:675 routes.py:699 routes.py:723
+#: routes.py:54 routes.py:372 routes.py:380 routes.py:388 routes.py:441
+#: routes.py:580 routes.py:629 routes.py:640 routes.py:655 routes.py:666
+#: routes.py:729 routes.py:754 routes.py:777
 msgid "Sozlamalar"
 msgstr ""
 
-#: routes.py:142 routes.py:269 routes.py:378 routes.py:562 routes.py:564
-#: routes.py:580 routes.py:581 routes.py:606 routes.py:607 routes.py:635
-#: routes.py:669 routes.py:670 routes.py:694 routes.py:695
+#: routes.py:127 routes.py:161 routes.py:195 routes.py:321 routes.py:436
+#: routes.py:606 routes.py:608 routes.py:624 routes.py:625 routes.py:650
+#: routes.py:651 routes.py:681 routes.py:705 routes.py:722 routes.py:724
+#: routes.py:738 routes.py:748 routes.py:750
 msgid "Bekor qilish"
 msgstr ""
 
-#: routes.py:533
+#: routes.py:578
 msgid "Ma'lumotlarni ko'rish"
 msgstr ""
 
-#: routes.py:548
+#: routes.py:593
 msgid "Ism sharifini o`zgartirish"
 msgstr ""
 
-#: routes.py:550
+#: routes.py:595
 msgid "Telefonni o`zgartirish"
 msgstr ""
 
-#: routes.py:567 routes.py:569
+#: routes.py:611 routes.py:613
 msgid "Kontaktni yuboring"
 msgstr ""
 
-#: routes.py:634
+#: routes.py:679
 msgid "Ism sharifini o'zgartirish"
 msgstr ""
 
-#: routes.py:634
+#: routes.py:679
 msgid "Telefonni o'zgartirish"
 msgstr ""
 
-#: routes.py:634
-msgid "Hududi o'zgartirish"
+#: routes.py:680
+msgid "Hududni o'zgartirish"
 msgstr ""
 
