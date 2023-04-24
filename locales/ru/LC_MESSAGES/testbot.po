@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-04-23 18:27-0700\n"
+"POT-Creation-Date: 2023-04-24 11:35-0700\n"
 "PO-Revision-Date: 2023-04-16 00:53-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -73,6 +73,10 @@ msgstr "Изменить телефон"
 #: routes.py:680
 msgid "Hududni o'zgartirish"
 msgstr "Поменять область"
+
+#: routes.py:705
+msgid "Tugmasini bosing"
+msgstr "Нажмите на кнопку"
 
 #~ msgid "Asosiy menyu"
 #~ msgstr "Главное меню"

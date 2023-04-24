@@ -702,7 +702,7 @@ async def change_viloyat_button(message: types.Message):
     user = user.scalar()
     kb = await get_viloyats(user.lang)
     await Regist.change_viloyat.set()
-    await bot.send_message(message.from_user.id, "Tugmasini bosing", reply_markup=kb.add( _('Bekor qilish')))
+    await bot.send_message(message.from_user.id, _("Tugmasini bosing"), reply_markup=kb.add( _('Bekor qilish')))
 
 
 async def handlers_uz():
