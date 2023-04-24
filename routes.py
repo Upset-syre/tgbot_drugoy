@@ -79,7 +79,7 @@ async def commands_start(message: types.Message):
 async def take_text(lang, step, user_id, message=None, ls=None):
     text = await db.session.execute(select(db.Text).filter_by(lang=lang))
     text = text.scalar()
-    #
+
     if step == 0:
         await bot.send_message(user_id, text.greeting)
 
@@ -734,7 +734,7 @@ async def change_viloyat(message: types.Message, state: FSMContext):
             await Regist.next()
 
             text = await take_text(user.lang, 4, message.from_user.id, message)
-            await bot.send_message(message.from_user.id, text)
+            await bot.send_message(message.from_user.id, text, reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(_('Bekor qilish')))
 
 
 @dp.message_handler(state=Regist.change_tuman)
@@ -745,6 +745,7 @@ async def change_tuman(message: types.Message, state: FSMContext):
     user = user.scalar()
 
     if new_tuman == _('Bekor qilish'):
+        await state.finish()
         await bot.send_message(user_id, _('Bekor qilish'), reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(
             KeyboardButton(_('Mening murojaatlarim'))
         ).add(KeyboardButton(_('Murojaatingizni qoldiring'))
@@ -753,10 +754,7 @@ async def change_tuman(message: types.Message, state: FSMContext):
         return
 
     else:
-        async with state.proxy() as data:
-            object = tuple(data.values())
-            print(object)
-
+       
         if user.lang == 'uz':
             cat = await db.session.execute(select(db.Viloyat).filter_by(name_uz=object[0]))
         if user.lang == 'ru':
