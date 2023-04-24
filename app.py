@@ -1,14 +1,9 @@
 from aiogram import executor
-from aiogram.utils.executor import start_webhook, set_webhook
-import logging
+# from aiogram.utils.executor import start_webhook, set_webhook
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
-import db
 from loader import dp
 from db import engine, Base
 import routes
-
-# from utils.notify_admins import on_startup_notify
-
 from utils.misc.set_bot_commands import set_default_commands
 
 dp.middleware.setup(LoggingMiddleware())

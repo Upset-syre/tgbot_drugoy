@@ -591,19 +591,18 @@ async def change_settings(message: types.Message, state: FSMContext):
     user = await db.session.execute(select(db.User).filter_by(tg_user_id=message.from_user.id))
     user = user.scalar()
     if message.text == _('Ism sharifini o`zgartirish'):
-        await changes(message.from_user.id, state, message, Regist, user.lang, 'change_name')
+        await changes(message.from_user.id, message, Regist, user.lang, 'change_name')
     if message.text == _('Telefonni o`zgartirish'):
-        await changes(message.from_user.id, state, message, Regist, user.lang, 'change_phone')
+        await changes(message.from_user.id, message, Regist, user.lang, 'change_phone')
 
 
-async def changes(user_id, state, message, Regist, lang, step):
+async def changes(user_id, message, Regist, lang, step):
     if step == 'change_name':
         await Regist.change_name.set()
 
         text = await take_text(lang, 1, user_id, message)
-        await bot.send_message(user_id, text)
 
-        await bot.send_message(user_id, _('Bekor qilish'),
+        await bot.send_message(user_id, text,
                                reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(
                                    KeyboardButton(_('Bekor qilish'))))
     if step == 'change_phone':
