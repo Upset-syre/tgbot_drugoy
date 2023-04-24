@@ -71,7 +71,6 @@ msgid "Telefonni o'zgartirish"
 msgstr "Изменить телефон"
 
 #: routes.py:680
-#, fuzzy
 msgid "Hududni o'zgartirish"
 msgstr "Поменять область"
 
