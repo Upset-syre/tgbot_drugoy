@@ -21,6 +21,7 @@ async def on_startup(dp):
     print('bot online')
     # await routes.handlers_uz_kir()
     await routes.handlers_uz()
+    await routes.handler_murojats()
     # await routes.handlers_ru()
     routes.lang_change_handler()
     routes.handlers_settings_changes()

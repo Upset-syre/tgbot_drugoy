@@ -267,41 +267,18 @@ async def get_viloyats(lang: str) -> ReplyKeyboardMarkup:
 
     return kb
 
+async def get_orders(user_id):
+    apps = await db.session.execute(select(db.Application).join(db.User, db.User.id == db.Application.user_id).filter(
+        db.User.tg_user_id == user_id).order_by(db.Application.id))
 
-@dp.message_handler(state=Regist.viloyat)
-async def load_viloyat(message: types.Message, state: FSMContext):
-    step = 4
+    apps = apps.scalars()
 
-    async with state.proxy() as data:
-        data['viloyat'] = message.text
-        await Regist.next()
+    kb_generator = [f'№{x.id}' for x in apps]
 
-    text = await take_text(status_lang, step, message.from_user.id, message)
-    await bot.send_message(message.from_user.id, text)
+    kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=True).add(*kb_generator)
 
+    return kb
 
-@dp.message_handler(state=Regist.tuman)
-async def load_tuman(message: types.Message, state: FSMContext):
-    step = 5
-
-    async with state.proxy() as data:
-        data['tuman'] = message.text
-        await Regist.next()
-
-    text = await take_text(status_lang, step, message.from_user.id, message)
-    await bot.send_message(message.from_user.id, text)
-
-
-@dp.message_handler(regexp=r"^(\d+)$", state=Regist.years)
-async def load_years(message: types.Message, state: FSMContext):
-    step = 6
-
-    async with state.proxy() as data:
-        data['years'] = int(message.text)
-        await Regist.next()
-
-    text = await take_text(status_lang, step, message.from_user.id, message)
-    await bot.send_message(message.from_user.id, text)
 
 
 @dp.message_handler(state=Regist.ad)
@@ -468,43 +445,53 @@ async def send_mail2(message: str) -> str:
         return f"{_ex}\nCheck your login or password please!"
 
 
+# @dp.message_handler(Text(equals='Mening murojaatlarim'))
+# @dp.message_handler(Text(equals='Мои обращения'))
+# @dp.message_handler(Text(equals='Менинг мурожаатларим'))
+# async def my_applications(message: types.Message):
+#     user_id = message.from_user.id
+#
+#     apps = await db.session.execute(select(db.Application).join(db.User, db.User.id == db.Application.user_id).filter(
+#         db.User.tg_user_id == user_id).order_by(db.Application.id))
+#
+#     user = await db.session.execute(select(db.User).filter_by(tg_user_id=user_id))
+#     user = user.scalar()
+#
+#     apps = apps.scalars()
+#
+#     for i in apps:
+#         if user.lang == 'uz':
+#
+#             message = f'''№{i.id}
+# {'sizning murojaatingiz'}: {i.application}
+# {'Murojat holati'}: {i.status}
+# {'murojatga javob'}: {i.answer if i.answer != None else ''}
+#             '''
+#         elif user.lang == 'ru':
+#
+#             message = f'''№{i.id}
+# {'Ваше обращение'}: {i.application}
+# {'Cтатус обращения'}: {i.status}
+# {'Ответ на обращение'}: {i.answer if i.answer != None else ''}
+#             '''
+#         else:
+#
+#             message = f'''№{i.id}
+# {'Сизнинг мурожатингиз'}: {i.application}
+# {'Мурожат холати'}: {i.status}
+# {'Мурожатга жавоб'}: {i.answer if i.answer != None else ''}
+#                     '''
+#         await bot.send_message(user_id, message)
+
 @dp.message_handler(Text(equals='Mening murojaatlarim'))
 @dp.message_handler(Text(equals='Мои обращения'))
 @dp.message_handler(Text(equals='Менинг мурожаатларим'))
 async def my_applications(message: types.Message):
     user_id = message.from_user.id
 
-    apps = await db.session.execute(select(db.Application).join(db.User, db.User.id == db.Application.user_id).filter(
-        db.User.tg_user_id == user_id).order_by(db.Application.id))
+    kb = await get_orders(user_id)
 
-    user = await db.session.execute(select(db.User).filter_by(tg_user_id=user_id))
-    user = user.scalar()
-
-    apps = apps.scalars()
-
-    for i in apps:
-        if user.lang == 'uz':
-
-            message = f'''№{i.id}
-{'sizning murojaatingiz'}: {i.application} 
-{'Murojat holati'}: {i.status}
-{'murojatga javob'}: {i.answer if i.answer != None else ''}
-            '''
-        elif user.lang == 'ru':
-
-            message = f'''№{i.id}
-{'Ваше обращение'}: {i.application} 
-{'Cтатус обращения'}: {i.status}
-{'Ответ на обращение'}: {i.answer if i.answer != None else ''}
-            '''
-        else:
-
-            message = f'''№{i.id}
-{'Сизнинг мурожатингиз'}: {i.application} 
-{'Мурожат холати'}: {i.status}
-{'Мурожатга жавоб'}: {i.answer if i.answer != None else ''}
-                    '''
-        await bot.send_message(user_id, message)
+    await bot.send_message(user_id, _('Murojaati nomerni tanlang!'), reply_markup=kb.add(_('Bekor qilish')))
 
 
 def lang_change_handler():
@@ -711,6 +698,51 @@ async def handlers_uz():
         dp.register_message_handler(change_viloyat, Text(equals=x.name_uz), state=None)
 
 
+async def handler_murojats():
+    cats = await db.session.execute(select(db.Application))
+    cats = cats.scalars()
+    for x in cats:
+        dp.register_message_handler(get_murojat, Text(equals=f'№{x.id}'), state=None)
+
+
+async def get_murojat(message: types.Message):
+    user_id = message.from_user.id
+
+    apps = await db.session.execute(select(db.Application).filter(
+         db.Application.id == int(message.text[1])))
+
+    user = await db.session.execute(select(db.User).filter_by(tg_user_id=user_id))
+    user = user.scalar()
+
+    app = apps.scalar()
+
+
+    if user.lang == 'uz':
+
+        message = f'''№{app.id}
+{'sizning murojaatingiz'}: {app.application}
+{'Murojat holati'}: {app.status}
+{'murojatga javob'}: {app.answer if app.answer != None else ''}
+            '''
+    elif user.lang == 'ru':
+
+            message = f'''№{app.id}
+{'Ваше обращение'}: {app.application}
+{'Cтатус обращения'}: {app.status}
+{'Ответ на обращение'}: {app.answer if app.answer != None else ''}
+            '''
+    else:
+
+            message = f'''№{app.id}
+{'Сизнинг мурожатингиз'}: {app.application}
+{'Мурожат холати'}: {app.status}
+{'Мурожатга жавоб'}: {app.answer if app.answer != None else ''}
+                    '''
+    await bot.send_message(user_id, message, reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(
+            KeyboardButton(_('Mening murojaatlarim'))
+        ).add(KeyboardButton(_('Murojaatingizni qoldiring'))
+              ).add(KeyboardButton(_("Tilni o'zgartirish"))).add(
+            KeyboardButton(_('Sozlamalar'))))
 @dp.message_handler(state=Regist.change_viloyat)
 async def change_viloyat(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
