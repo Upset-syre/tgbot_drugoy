@@ -1,11 +1,12 @@
 from sqlalchemy import Column, String, Integer, Text, ForeignKey, select, BigInteger
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import declarative_base, relationship
+from config import SQLALCHEMY_DATABASE_URI
 
 Base = declarative_base()
 
 engine = create_async_engine(
-    "postgresql+asyncpg://postgres:123456@localhost:5432/tgbot2",
+    SQLALCHEMY_DATABASE_URI,
     echo=False,
 )
 
