@@ -251,6 +251,41 @@ async def load_phone(message: types.Message, state: FSMContext, editMessageReply
         await bot.send_message(message.from_user.id, text, reply_markup=kb)
 
 
+
+@dp.message_handler(state=Regist.viloyat)
+async def load_viloyat(message: types.Message, state: FSMContext):
+    step = 4
+
+    async with state.proxy() as data:
+        data['viloyat'] = message.text
+        await Regist.next()
+
+    text = await take_text(status_lang, step, message.from_user.id, message)
+    await bot.send_message(message.from_user.id, text)
+
+
+@dp.message_handler(state=Regist.tuman)
+async def load_tuman(message: types.Message, state: FSMContext):
+    step = 5
+
+    async with state.proxy() as data:
+        data['tuman'] = message.text
+        await Regist.next()
+
+    text = await take_text(status_lang, step, message.from_user.id, message)
+    await bot.send_message(message.from_user.id, text)
+
+
+@dp.message_handler(regexp=r"^(\d+)$", state=Regist.years)
+async def load_years(message: types.Message, state: FSMContext):
+    step = 6
+
+    async with state.proxy() as data:
+        data['years'] = int(message.text)
+        await Regist.next()
+
+    text = await take_text(status_lang, step, message.from_user.id, message)
+    await bot.send_message(message.from_user.id, text)
 async def get_viloyats(lang: str) -> ReplyKeyboardMarkup:
     viloyats = await db.session.execute(select(db.Viloyat))
 
@@ -709,7 +744,7 @@ async def get_murojat(message: types.Message):
     user_id = message.from_user.id
 
     apps = await db.session.execute(select(db.Application).filter(
-         db.Application.id == int(message.text[1])))
+         db.Application.id == int(message.text[1:])))
 
     user = await db.session.execute(select(db.User).filter_by(tg_user_id=user_id))
     user = user.scalar()
