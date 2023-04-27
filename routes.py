@@ -1,4 +1,5 @@
 from email.mime.text import MIMEText
+from pprint import pprint
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -25,6 +26,8 @@ class Regist(StatesGroup):
     phone = State()
     viloyat = State()
     tuman = State()
+    mfy = State()
+    sex = State()
     years = State()
     ad = State()
     user_id = State()
@@ -33,6 +36,8 @@ class Regist(StatesGroup):
     change_phone = State()
     change_viloyat = State()
     change_tuman = State()
+    change_mfy = State()
+    change_sex = State()
 
 
 @dp.message_handler(commands=['start', 'help'])
@@ -97,7 +102,10 @@ async def take_text(lang, step, user_id, message=None, ls=None):
         return text.step6
     if step == 7:
         return text.step7
-
+    if step == 8:
+        return text.step8
+    if step == 9:
+        return text.step9
 
 @dp.message_handler(Text(equals="Murojaatingizni qoldiring"))
 @dp.message_handler(Text(equals="O'zbekcha"))
@@ -121,8 +129,8 @@ async def murojat_handlers_uz(message: types.Message, state: FSMContext):
             data['phone'] = user.year
             data['lang'] = user.lang
             data['viloyat'] = user.viloyati.name_uz
-            data['tuman'] = user.tuman
-            text = await take_text(user.lang, 6, message.from_user.id, message)
+            data['tuman'] = user.tuman_id
+            text = await take_text(user.lang, 8, message.from_user.id, message)
             await bot.send_message(user_id, text, reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(
                 KeyboardButton(_('Bekor qilish'))))
 
@@ -155,8 +163,8 @@ async def murojat_handlers_ru(message: types.Message, state: FSMContext):
             data['phone'] = user.year
             data['lang'] = user.lang
             data['viloyat'] = user.viloyati.name_uz
-            data['tuman'] = user.tuman
-            text = await take_text(user.lang, 6, message.from_user.id, message)
+            data['tuman'] = user.tuman_id
+            text = await take_text(user.lang, 8, message.from_user.id, message)
             await bot.send_message(user_id, text, reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(
                 KeyboardButton(_('Bekor qilish'))))
 
@@ -189,8 +197,8 @@ async def murojat_handlers_uz_kir(message: types.Message, state: FSMContext):
             data['phone'] = user.year
             data['lang'] = user.lang
             data['viloyat'] = user.viloyati.name_uz
-            data['tuman'] = user.tuman
-            text = await take_text(user.lang, 6, message.from_user.id, message)
+            data['tuman'] = user.tuman_id
+            text = await take_text(user.lang, 8, message.from_user.id, message)
             await bot.send_message(user_id, text, reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(
                 KeyboardButton(_('Bekor qilish'))))
 
@@ -251,6 +259,66 @@ async def load_phone(message: types.Message, state: FSMContext, editMessageReply
         await bot.send_message(message.from_user.id, text, reply_markup=kb)
 
 
+async def generate_tuman_kb(viloyat: str, lang: str) -> ReplyKeyboardMarkup:
+
+    if lang == 'uz':
+        viloyat_m = await db.session.execute(select(db.Viloyat).filter_by(name_uz=viloyat))
+        viloyat_m = viloyat_m.scalar()
+        print(f' {viloyat}')
+        print(f' {viloyat_m}')
+        tumans = await db.session.execute(select(db.Tuman).filter_by(viloyat_id=viloyat_m.id))
+        tumans = tumans.scalars()
+
+        kb_generator = [x.name_uz2 for x in tumans]
+
+    elif lang == 'ru':
+        viloyat_m = await db.session.execute(select(db.Viloyat).filter_by(name_ru=viloyat))
+        viloyat_m = viloyat_m.scalar()
+        tumans = await db.session.execute(select(db.Tuman).filter_by(viloyat_id=viloyat_m.id))
+        tumans = tumans.scalars()
+
+        kb_generator = [x.name_ru2 for x in tumans]
+    else:
+        viloyat_m = await db.session.execute(select(db.Viloyat).filter_by(name_uz_kir=viloyat))
+        viloyat_m = viloyat_m.scalar()
+        tumans = await db.session.execute(select(db.Tuman).filter_by(viloyat_id=viloyat_m.id))
+        tumans = tumans.scalars()
+
+        kb_generator = [x.name_uz_kir2 for x in tumans]
+
+    kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=True).add(*kb_generator)
+
+    return kb
+
+
+async def generate_mahalla_kb(tuman: str, lang: str) -> ReplyKeyboardMarkup:
+    if lang == 'uz':
+        tuman_m = await db.session.execute(select(db.Tuman).filter_by(name_uz2=tuman))
+        tuman_m = tuman_m.scalar()
+        mfy = await db.session.execute(select(db.Mfy).filter_by(tuman_id=tuman_m.id))
+        tumans = mfy.scalars()
+
+        kb_generator = [x.name_uz for x in tumans]
+
+    elif lang == 'ru':
+        tuman_m = await db.session.execute(select(db.Tuman).filter_by(name_ru2=tuman))
+        tuman_m = tuman_m.scalar()
+        mfy = await db.session.execute(select(db.Mfy).filter_by(tuman_id=tuman_m.id))
+        tumans = mfy.scalars()
+
+        kb_generator = [x.name_ru for x in tumans]
+    else:
+        tuman_m = await db.session.execute(select(db.Tuman).filter_by(name_uz_kir2=tuman))
+        tuman_m = tuman_m.scalar()
+        tumans = await db.session.execute(select(db.Mfy).filter_by(viloyat_id=tuman_m.id))
+        tumans = tumans.scalars()
+
+        kb_generator = [x.name_uz_kir for x in tumans]
+
+    kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=True).add(*kb_generator)
+
+    return kb
+
 
 @dp.message_handler(state=Regist.viloyat)
 async def load_viloyat(message: types.Message, state: FSMContext):
@@ -261,7 +329,8 @@ async def load_viloyat(message: types.Message, state: FSMContext):
         await Regist.next()
 
     text = await take_text(status_lang, step, message.from_user.id, message)
-    await bot.send_message(message.from_user.id, text)
+    kb = await generate_tuman_kb(message.text, status_lang)
+    await bot.send_message(message.from_user.id, text, reply_markup=kb)
 
 
 @dp.message_handler(state=Regist.tuman)
@@ -273,19 +342,52 @@ async def load_tuman(message: types.Message, state: FSMContext):
         await Regist.next()
 
     text = await take_text(status_lang, step, message.from_user.id, message)
-    await bot.send_message(message.from_user.id, text)
+    kb = await generate_mahalla_kb(message.text, status_lang)
+    await bot.send_message(message.from_user.id, text, reply_markup=kb)
+
+
+@dp.message_handler(state=Regist.mfy)
+async def load_mfy(message: types.Message, state: FSMContext):
+    step = 6
+
+    async with state.proxy() as data:
+        data['mfy'] = message.text
+        await Regist.next()
+
+    text = await take_text(status_lang, step, message.from_user.id, message)
+    await bot.send_message(message.from_user.id, text,
+                           reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(KeyboardButton('Erkak'),
+                                                                                      KeyboardButton('Ayol')))
+
+
+@dp.message_handler(state=Regist.sex)
+async def load_sex(message: types.Message, state: FSMContext):
+    step = 7
+
+    async with state.proxy() as data:
+        data['sex'] = message.text
+        await Regist.next()
+
+    text = await take_text(status_lang, step, message.from_user.id, message)
+    await bot.send_message(message.from_user.id, text, reply_markup=ReplyKeyboardRemove())
 
 
 @dp.message_handler(regexp=r"^(\d+)$", state=Regist.years)
 async def load_years(message: types.Message, state: FSMContext):
-    step = 6
+    step = 8
 
-    async with state.proxy() as data:
-        data['years'] = int(message.text)
-        await Regist.next()
+    if int(message.text) > 14 and int(message.text) < 36:
+        print(message.text)
+        async with state.proxy() as data:
+            data['years'] = int(message.text)
+            await Regist.next()
 
-    text = await take_text(status_lang, step, message.from_user.id, message)
-    await bot.send_message(message.from_user.id, text)
+        text = await take_text(status_lang, step, message.from_user.id, message)
+        await bot.send_message(message.from_user.id, text)
+    else:
+        await bot.send_message(message.from_user.id, '15-35')
+
+
 async def get_viloyats(lang: str) -> ReplyKeyboardMarkup:
     viloyats = await db.session.execute(select(db.Viloyat))
 
@@ -302,6 +404,24 @@ async def get_viloyats(lang: str) -> ReplyKeyboardMarkup:
 
     return kb
 
+
+async def get_mfys(lang: str) -> ReplyKeyboardMarkup:
+    mahalas = await db.session.execute(select(db.Mfy))
+
+    mahalas = mahalas.scalars()
+
+    if lang == 'ru':
+        kb_generator = [x.name_ru for x in mahalas]
+    elif lang == 'uz_kir':
+        kb_generator = [x.name_uz_kir for x in mahalas]
+    else:
+        kb_generator = [x.name_uz for x in mahalas]
+
+    kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=True).add(*kb_generator)
+
+    return kb
+
+
 async def get_orders(user_id):
     apps = await db.session.execute(select(db.Application).join(db.User, db.User.id == db.Application.user_id).filter(
         db.User.tg_user_id == user_id).order_by(db.Application.id))
@@ -315,10 +435,9 @@ async def get_orders(user_id):
     return kb
 
 
-
 @dp.message_handler(state=Regist.ad)
 async def load_ad(message: types.Message, state: FSMContext):
-    step = 7
+    step = 9
 
     async with state.proxy() as data:
         data['ad'] = message.text
@@ -333,7 +452,9 @@ async def load_ad(message: types.Message, state: FSMContext):
     if object[5] == _('Bekor qilish') or object[0] == _('Bekor qilish'):
         return
 
-    await sql_read2(message, status_lang, step)
+    id = await sql_read2(message, status_lang, step)
+    dp.register_message_handler(get_murojat, Text(equals=f'№{id}'), state=None)
+
     if status_lang == 'uz':
         await bot.send_message(message.from_user.id, 'Asosiy menyu',
                                reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(
@@ -345,15 +466,15 @@ async def load_ad(message: types.Message, state: FSMContext):
         await bot.send_message(message.from_user.id, 'Главное меню',
                                reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(
                                    KeyboardButton('Мои обращения')
-                                   ).add(KeyboardButton('Оставьте обращение')
-                                         ).add(KeyboardButton("Поменять язык")).add(
+                               ).add(KeyboardButton('Оставьте обращение')
+                                     ).add(KeyboardButton("Поменять язык")).add(
                                    KeyboardButton('Настройки')))
     else:
         await bot.send_message(message.from_user.id, 'Асосий меню',
                                reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(
                                    KeyboardButton('Менинг мурожаатларим')
-                                   ).add(KeyboardButton('Мурожаатингизни қолдиринг')
-                                         ).add(KeyboardButton("Тилни ўзгартириш")).add(
+                               ).add(KeyboardButton('Мурожаатингизни қолдиринг')
+                                     ).add(KeyboardButton("Тилни ўзгартириш")).add(
                                    KeyboardButton('Созламалар')))
 
 
@@ -366,7 +487,9 @@ async def sql_read2(message, lang, step):
     for i in app:
         ls.append(i)
     text = await take_text(lang, step, message.from_user.id, message, str(ls[-1]))
+    text = str(text).replace('__', f'{ls[-1]}')
     await bot.send_message(message.from_user.id, text)
+    return ls[-1]
 
 
 async def createUser(state, user_id):
@@ -422,23 +545,37 @@ async def createUser(state, user_id):
 
             else:
 
-                if object[7] == 'uz':
+                if object[9] == 'uz':
                     cat = await db.session.execute(select(db.Viloyat).filter_by(name_uz=object[2]))
-                if object[7] == 'ru':
-                    cat = await db.session.execute(select(db.Viloyat).filter_by(name_ru=object[2]))
-                if object[7] == 'uz_kir':
-                    cat = await db.session.execute(select(db.Viloyat).filter_by(name_uz_kir=object[2]))
-                cat = cat.scalar()
+                    tuman_id = await get_tuman_id(object[3])
+                    mfy = await db.session.execute(select(db.Mfy).filter_by(name_uz=object[4]))
 
-                user = db.User(fio=object[0], phone=object[1], viloyat_id=cat.id, year=object[4], tuman=object[3],
-                               tg_user_id=object[6], lang=object[7])
+
+                if object[9] == 'ru':
+                    cat = await db.session.execute(select(db.Viloyat).filter_by(name_ru=object[2]))
+                    tuman_id = await get_tuman_id(object[3])
+                if object[9] == 'uz_kir':
+                    cat = await db.session.execute(select(db.Viloyat).filter_by(name_uz_kir=object[2]))
+                    tuman_id = await get_tuman_id(object[3])
+                cat = cat.scalar()
+                mfy = mfy.scalar()
+
+                user = db.User(fio=object[0], phone=object[1], viloyat_id=cat.id, year=object[6], mfy_id=mfy.id, sex=object[5], tuman_id=tuman_id,
+                               tg_user_id=object[8], lang=object[9])
                 db.session.add(user)
                 await db.session.flush()
 
-                app = db.Application(application=object[5], user_id=user.id, lang=object[7])
+                app = db.Application(application=object[7], user_id=user.id, lang=object[9])
 
                 db.session.add_all([user, app])
                 await db.session.commit()
+
+
+async def get_tuman_id(tuman: str) -> db.Tuman.id:
+    tuman = await db.session.execute(select(db.Tuman).filter_by(name_uz2=tuman))
+
+    tuman = tuman.scalar()
+    return tuman.id
 
 
 @dp.message_handler(Text(equals='Bekor qilish'))
@@ -694,7 +831,11 @@ async def sendMyName(message: types.Message):
     user_id = message.from_user.id
     user = await db.session.execute(
         select(db.User).filter_by(tg_user_id=user_id).options(selectinload(db.User.viloyati)))
+
     user = user.scalar()
+
+    tuman = await db.session.execute(select(db.Tuman).filter_by(id=user.tuman_id))
+    tuman = tuman.scalar()
 
     sets_change = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(
         KeyboardButton(_("Ism sharifini o'zgartirish"))).add(KeyboardButton(_("Telefonni o'zgartirish"))).add(
@@ -703,15 +844,15 @@ async def sendMyName(message: types.Message):
 
     if user.lang == 'uz':
         await bot.send_message(user_id,
-                               f'Sizning FISh {user.fio}, sizning telefon raqamingiz: {user.phone}, {user.viloyati.name_uz}, {user.tuman}',
+                               f'Sizning FISh {user.fio}, sizning telefon raqamingiz: {user.phone}, {user.viloyati.name_uz}, {tuman.name_uz2}',
                                reply_markup=sets_change)
     elif user.lang == 'ru':
         await bot.send_message(user_id,
-                               f'Ваше ФИО  {user.fio}, ваш номер телефона: {user.phone}, {user.viloyati.name_ru}, {user.tuman}',
+                               f'Ваше ФИО  {user.fio}, ваш номер телефона: {user.phone}, {user.viloyati.name_ru}, {tuman.name_ru2}',
                                reply_markup=sets_change)
     else:
         await bot.send_message(user_id,
-                               f'Сизнинг ФИШ {user.fio}, сизнинг телефон рақамингиз: {user.phone}, {user.viloyati.name_uz_kir}, {user.tuman}',
+                               f'Сизнинг ФИШ {user.fio}, сизнинг телефон рақамингиз: {user.phone}, {user.viloyati.name_uz_kir}, {tuman.name_uz_kir2}',
                                reply_markup=sets_change)
 
 
@@ -723,7 +864,7 @@ async def change_viloyat_button(message: types.Message):
     user = user.scalar()
     kb = await get_viloyats(user.lang)
     await Regist.change_viloyat.set()
-    await bot.send_message(message.from_user.id, _("Tugmasini bosing"), reply_markup=kb.add( _('Bekor qilish')))
+    await bot.send_message(message.from_user.id, _("Tugmasini bosing"), reply_markup=kb.add(_('Bekor qilish')))
 
 
 async def handlers_uz():
@@ -742,15 +883,14 @@ async def handler_murojats():
 
 async def get_murojat(message: types.Message):
     user_id = message.from_user.id
-
+    print(int(message.text[1:]))
     apps = await db.session.execute(select(db.Application).filter(
-         db.Application.id == int(message.text[1:])))
+        db.Application.id == int(message.text[1:])))
 
     user = await db.session.execute(select(db.User).filter_by(tg_user_id=user_id))
     user = user.scalar()
 
     app = apps.scalar()
-
 
     if user.lang == 'uz':
 
@@ -761,23 +901,25 @@ async def get_murojat(message: types.Message):
             '''
     elif user.lang == 'ru':
 
-            message = f'''№{app.id}
+        message = f'''№{app.id}
 {'Ваше обращение'}: {app.application}
 {'Cтатус обращения'}: {app.status}
 {'Ответ на обращение'}: {app.answer if app.answer != None else ''}
             '''
     else:
 
-            message = f'''№{app.id}
+        message = f'''№{app.id}
 {'Сизнинг мурожатингиз'}: {app.application}
 {'Мурожат холати'}: {app.status}
 {'Мурожатга жавоб'}: {app.answer if app.answer != None else ''}
                     '''
     await bot.send_message(user_id, message, reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(
-            KeyboardButton(_('Mening murojaatlarim'))
-        ).add(KeyboardButton(_('Murojaatingizni qoldiring'))
-              ).add(KeyboardButton(_("Tilni o'zgartirish"))).add(
-            KeyboardButton(_('Sozlamalar'))))
+        KeyboardButton(_('Mening murojaatlarim'))
+    ).add(KeyboardButton(_('Murojaatingizni qoldiring'))
+          ).add(KeyboardButton(_("Tilni o'zgartirish"))).add(
+        KeyboardButton(_('Sozlamalar'))))
+
+
 @dp.message_handler(state=Regist.change_viloyat)
 async def change_viloyat(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
@@ -799,9 +941,10 @@ async def change_viloyat(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data['change_viloyat'] = message.text
             await Regist.next()
-
+            kb = await generate_tuman_kb(message.text, user.lang)
             text = await take_text(user.lang, 4, message.from_user.id, message)
-            await bot.send_message(message.from_user.id, text, reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(_('Bekor qilish')))
+            await bot.send_message(message.from_user.id, text,
+                                   reply_markup=kb.add(_('Bekor qilish')))
 
 
 @dp.message_handler(state=Regist.change_tuman)
@@ -822,20 +965,77 @@ async def change_tuman(message: types.Message, state: FSMContext):
 
     else:
         async with state.proxy() as data:
+            data['change_tuman'] = new_tuman
+        #     object = tuple(data.values())
+        #
+        # if user.lang == 'uz':
+        #     cat = await db.session.execute(select(db.Viloyat).filter_by(name_uz=object[0]))
+        # if user.lang == 'ru':
+        #     cat = await db.session.execute(select(db.Viloyat).filter_by(name_ru=object[0]))
+        # if user.lang == 'uz_kir':
+        #     cat = await db.session.execute(select(db.Viloyat).filter_by(name_uz_kir=object[0]))
+        # cat = cat.scalar()
+        #
+        # user.viloyat_id = cat.id
+        # user.tuman = new_tuman
+        # await db.session.commit()
+        await Regist.next()
+
+        text = await take_text(user.lang, 5, message.from_user.id, message)
+        kb = await generate_mahalla_kb(new_tuman, user.lang)
+        await bot.send_message(message.from_user.id, text, reply_markup=kb.add(_('Bekor qilish')))
+
+        # await state.finish()
+
+        # await bot.send_message(message.from_user.id, 'ok', reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(
+        #     KeyboardButton(_('Mening murojaatlarim'))
+        # ).add(KeyboardButton(_('Murojaatingizni qoldiring'))
+        #       ).add(KeyboardButton(_("Tilni o'zgartirish"))).add(
+        #     KeyboardButton(_('Sozlamalar'))))
+
+@dp.message_handler(state=Regist.change_mfy)
+async def change_mfy(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+    new_mfy = message.text
+    user = await db.session.execute(select(db.User).filter_by(tg_user_id=user_id))
+    user = user.scalar()
+
+    if new_mfy == _('Bekor qilish'):
+        await state.finish()
+        await bot.send_message(user_id, _('Bekor qilish'), reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(
+            KeyboardButton(_('Mening murojaatlarim'))
+        ).add(KeyboardButton(_('Murojaatingizni qoldiring'))
+              ).add(KeyboardButton(_("Tilni o'zgartirish"))).add(
+            KeyboardButton(_('Sozlamalar'))))
+        return
+
+    else:
+        async with state.proxy() as data:
             object = tuple(data.values())
 
         if user.lang == 'uz':
             cat = await db.session.execute(select(db.Viloyat).filter_by(name_uz=object[0]))
+            tuman = await db.session.execute(select(db.Tuman).filter_by(name_uz2=object[1]))
+            mfy = await db.session.execute(select(db.Mfy).filter_by(name_uz=new_mfy))
         if user.lang == 'ru':
             cat = await db.session.execute(select(db.Viloyat).filter_by(name_ru=object[0]))
+            tuman = await db.session.execute(select(db.Tuman).filter_by(name_ru2=object[1]))
+            mfy = await db.session.execute(select(db.Mfy).filter_by(name_ru=new_mfy))
         if user.lang == 'uz_kir':
             cat = await db.session.execute(select(db.Viloyat).filter_by(name_uz_kir=object[0]))
+            tuman = await db.session.execute(select(db.Tuman).filter_by(name_uz_kir2=object[1]))
+            mfy = await db.session.execute(select(db.Mfy).filter_by(name_uz_kir=new_mfy))
         cat = cat.scalar()
+        tuman = tuman.scalar()
+        mfy = mfy.scalar()
 
         user.viloyat_id = cat.id
-        user.tuman = new_tuman
+        user.tuman_id = tuman.id
+        user.mfy_id = mfy.id
         await db.session.commit()
+
         await state.finish()
+
         await bot.send_message(message.from_user.id, 'ok', reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(
             KeyboardButton(_('Mening murojaatlarim'))
         ).add(KeyboardButton(_('Murojaatingizni qoldiring'))

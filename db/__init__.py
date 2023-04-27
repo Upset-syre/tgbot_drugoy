@@ -20,7 +20,9 @@ class User(Base):
     fio = Column('fio', String)
     phone = Column('phone', String)
     lang = Column('lang', String)
-    tuman = Column('tuman', String(100))
+    tuman_id = Column('tuman_id', Integer)
+    mfy_id = Column('mfy_id', Integer)
+    sex = Column('sex', String)
     year = Column('year', Integer)
     tg_user_id = Column('tg_user_id', BigInteger)
     application = relationship("Application", backref='users')
@@ -51,19 +53,9 @@ class Text(Base):
     step5 = Column('step5', Text)
     step6 = Column('step6', Text)
     step7 = Column('step7', Text)
+    step8 = Column('step8', Text)
+    step9 = Column('step9', Text)
     lang = Column('lang', Text)
-
-    def __int__(self, id, greeting, step1, step2, step3, step4, step5, step6, step7, lang):
-        self.id = id
-        self.greeting = greeting
-        self.step1 = step1
-        self.step2 = step2
-        self.step3 = step3
-        self.step4 = step4
-        self.step5 = step5
-        self.step6 = step6
-        self.step7 = step7
-        self.lang = lang
 
 
 class Viloyat(Base):
@@ -73,6 +65,26 @@ class Viloyat(Base):
     name_ru = Column('name_ru', String(150))
     name_uz_kir = Column('name_uz_kir', String(150))
     user = relationship("User", backref='viloyati')
+    tumans = relationship("Tuman", backref='viloyati_tuman')
+
+
+class Tuman(Base):
+    __tablename__ = 'tuman'
+    id = Column('id', Integer, primary_key=True)
+    name_uz2 = Column('name_uz2', String(150))
+    name_ru2 = Column('name_ru2', String(150))
+    name_uz_kir2 = Column('name_uz_kir2', String(150))
+    viloyat_id = Column(Integer, ForeignKey('viloyat.id'))
+    mahalas = relationship("Mfy", backref='mahala')
+
+
+class Mfy(Base):
+    __tablename__ = 'mfy'
+    id = Column('id', Integer, primary_key=True)
+    name_uz = Column('name_uz', String(150))
+    name_ru = Column('name_ru', String(150))
+    name_uz_kir = Column('name_uz_kir', String(150))
+    tuman_id = Column(Integer, ForeignKey('tuman.id'))
 
 async def get_lang(user_id) -> str:
     try:
@@ -81,4 +93,4 @@ async def get_lang(user_id) -> str:
 
         return user.lang
     except:
-        return 'uz_kir'
+        return 'uz'
